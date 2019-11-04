@@ -1,0 +1,207 @@
+
+
+           // ********** call checkInternetConnection method in starting of 
+                                    every activity or fragment first then start other things ********//
+
+
+ checkInternetConnection();
+ 
+ ********** this the is the method **********
+ 
+ private boolean checkInternetConnection() {
+
+        if ((new ConnectionDetector(this).isConnectingToInternet())) {
+            Log.d("internet status", "Internet Access");
+
+            return true;
+        } else {
+            Log.d("internet status", "no Internet Access");
+
+            LayoutInflater factory = LayoutInflater.from(this);
+            final View deleteDialogView = factory.inflate(R.layout.raw_file_for_internet_connection, null);
+            final AlertDialog deleteDialog = new AlertDialog.Builder(this).create();
+            deleteDialog.setView(deleteDialogView);
+
+
+            TextView retry = deleteDialogView.findViewById(R.id.retry_internet_connection); // textview retry
+            TextView exit = deleteDialogView.findViewById(R.id.exit_internet_connection); // textview exit
+
+            retry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    checkInternetConnection();
+                    deleteDialog.dismiss();
+                }
+            });
+
+            exit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    LoginActivity.this.finish();
+                    deleteDialog.dismiss();
+                }
+            });
+
+            deleteDialog.show();
+            deleteDialog.setCancelable(true);
+
+            return false;
+        }
+
+    }
+
+          ************************ Add Connection detector another class **********************         
+          
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class ConnectionDetector {
+    private Context _context;
+
+    public ConnectionDetector(Context context) {
+        this._context = context;
+    }
+
+    public boolean isConnectingToInternet() {
+        if (networkConnectivity()) {
+            try {
+                HttpURLConnection urlc = (HttpURLConnection) (new URL(
+                        "http://www.google.com").openConnection());
+                urlc.setRequestProperty("User-Agent", "Test");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(3000);
+                urlc.setReadTimeout(4000);
+                urlc.connect();
+                // networkcode2 = urlc.getResponseCode();
+                return (urlc.getResponseCode() == 200);
+            } catch (IOException e) {
+                return (false);
+            }
+        } else
+            return false;
+
+    }
+
+    private boolean networkConnectivity() {
+        ConnectivityManager cm = (ConnectivityManager) _context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    }
+}
+ 
+                 *************** XML file for internet connection *****************
+                 
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_10"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_marginTop="@dimen/margin_10"
+            android:layout_width="@dimen/width_96"
+            android:layout_height="@dimen/height_96"
+            android:layout_gravity="center"
+            android:src="@drawable/app_logo"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_5"
+            android:textAlignment="center"
+            android:fontFamily="@font/montserrat_semibold"
+            android:textSize="@dimen/text_size16"
+            android:text="Internet connection is not available"
+            android:layout_margin="@dimen/margin_5"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_10"
+            android:textAlignment="center"
+            android:fontFamily="@font/montserrat_semibold"
+            android:textSize="@dimen/text_size12"
+            android:text="Please connect to the internet" />
+
+
+        <!--<View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary"
+            android:layout_margin="@dimen/margin_5"/>-->
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="@dimen/margin_15"
+            android:paddingHorizontal="@dimen/padding_15"
+            android:weightSum="2">
+
+            <TextView
+                android:id="@+id/retry_internet_connection"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_5"
+                android:layout_marginRight="@dimen/margin_5"
+                android:layout_marginLeft="@dimen/margin_5"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_background"
+                android:fontFamily="@font/montserrat_semibold"
+                android:padding="@dimen/padding_10"
+                android:text="Retry"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size16" />
+
+            <TextView
+                android:id="@+id/exit_internet_connection"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_5"
+                android:layout_marginRight="@dimen/margin_5"
+                android:layout_marginLeft="@dimen/margin_5"
+                android:layout_marginBottom="@dimen/margin_10"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_background"
+                android:fontFamily="@font/montserrat_semibold"
+                android:padding="@dimen/padding_10"
+                android:text="Exit"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size16" />
+
+        </LinearLayout>
+        
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>                 
+                 
+                 
