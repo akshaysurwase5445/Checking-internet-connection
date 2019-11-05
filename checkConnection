@@ -4,8 +4,21 @@
                                     every activity or fragment first then start other things ********//
 
 
+
  checkInternetConnection();
+
  
+// if you have to use it on any button put this
+  
+ private boolean newtworkState;
+  
+ newtworkState = checkInternetConnection();
+ 
+ if(newtworkState)
+ {
+   //put your code
+ }
+
  ********** this the is the method **********
  
  private boolean checkInternetConnection() {
